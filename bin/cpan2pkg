@@ -1,0 +1,43 @@
+#!/usr/bin/perl
+#
+# This file is part of App::CPAN2Pkg.
+# Copyright (c) 2009 Jerome Quelin, all rights reserved.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the same terms as Perl itself.
+#
+#
+
+use strict;
+use warnings;
+
+# for testing purposes
+use FindBin qw{ $Bin };
+use lib "$Bin/../lib";
+
+#use Getopt::Euclid;
+use App::CPAN2Pkg::Curses;
+use Hook::Output::File;
+
+my $hook;
+my $dir = _get_development_root();
+if ( defined $dir ) {
+    $hook = Hook::Output::File->redirect(
+        stdout => "$dir/cpan2pkg.stdout",
+        stderr => "$dir/cpan2pkg.stderr",
+    );
+    warn '-' x 40 . "\n";
+}
+
+my $ui = App::CPAN2Pkg::Curses->spawn({modules=>\@ARGV});
+$ui->mainloop;
+
+exit;
+
+sub _get_development_root {
+    my $dir = "$Bin/..";
+    return $dir if -d "$dir/.git";
+    return;
+}
+
+__END__
