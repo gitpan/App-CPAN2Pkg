@@ -17,9 +17,10 @@ use Class::XSAccessor
     constructor => '_new',
     accessors   => {
         name      => 'name',
-        shortname => 'shortname',
         _output    => '_output',
         _prereqs   => '_prereqs',
+        _rpm       => '_rpm',
+        _srpm      => '_srpm',
         _wheel     => '_wheel',
     };
 use POE;
@@ -52,15 +53,11 @@ my $rpm_locked = '';   # only one rpm transaction at a time
 # CONSTRUCTOR
 
 sub spawn {
-    my ($class, $module) = @_;
+    my ($class, $name) = @_;
 
     # creating the object
-    my $short = $module;
-    $short =~ s/::/:/g;
-    $short =~ s/[[:lower:]]//g;
     my $obj = App::CPAN2Pkg::Module->_new(
-        name      => $module,
-        shortname => $short,
+        name      => $name,
         _prereqs  => {},
         _wheel    => undef,
     );
@@ -69,17 +66,20 @@ sub spawn {
     my $session = POE::Session->create(
         inline_states => {
             # public events
-            cpan2dist         => \&cpan2dist,
-            find_prereqs      => \&find_prereqs,
-            install_from_dist => \&install_from_dist,
-            is_in_dist        => \&is_in_dist,
-            is_installed      => \&is_installed,
+            cpan2dist          => \&cpan2dist,
+            find_prereqs       => \&find_prereqs,
+            install_from_dist  => \&install_from_dist,
+            install_from_local => \&install_from_local,
+            is_in_dist         => \&is_in_dist,
+            is_installed       => \&is_installed,
             # private events
-            _find_prereqs      => \&_find_prereqs,
-            _install_from_dist => \&_install_from_dist,
-            _is_in_dist        => \&_is_in_dist,
-            _stderr            => \&_stderr,
-            _stdout            => \&_stdout,
+            _cpan2dist          => \&_cpan2dist,
+            _find_prereqs       => \&_find_prereqs,
+            _install_from_dist  => \&_install_from_dist,
+            _install_from_local => \&_install_from_local,
+            _is_in_dist         => \&_is_in_dist,
+            _stderr             => \&_stderr,
+            _stdout             => \&_stdout,
             # poe inline states
             _start => \&_start,
             #_stop  => sub { warn "stop " . $_[HEAP]->name . "\n"; },
@@ -97,16 +97,34 @@ sub spawn {
 
 sub cpan2dist {
     my ($k, $self) = @_[KERNEL, HEAP];
+
+    # preparing command
     my $name = $self->name;
-    warn "running: cpan2dist $name\n";
+    my $cmd = "cpan2dist --force --format=CPANPLUS::Dist::Mdv $name";
+    $self->_log_new_step('Building package', "Running command: $cmd" );
+
+    # running command
+    $self->_output('');
+    $ENV{LC_ALL} = 'C';
+    my $wheel = POE::Wheel::Run->new(
+        Program      => $cmd,
+        CloseEvent   => '_cpan2dist',
+        StdoutEvent  => '_stdout',
+        StderrEvent  => '_stderr',
+        StdoutFilter => POE::Filter::Line->new,
+        StderrFilter => POE::Filter::Line->new,
+    );
+
+    # need to store the wheel, otherwise the process goes woo!
+    $self->_wheel($wheel);
 }
 
 sub find_prereqs {
     my ($k, $self) = @_[KERNEL, HEAP];
 
     # preparing command
-    my $module = $self->name;
-    my $cmd = "cpanp /prereqs show $module";
+    my $name = $self->name;
+    my $cmd = "cpanp /prereqs show $name";
     $self->_log_new_step('Finding module prereqs', "Running command: $cmd" );
 
     # running command
@@ -153,6 +171,39 @@ sub install_from_dist {
         StderrFilter => POE::Filter::Line->new,
     );
     $k->sig( CHLD => '_install_from_dist' );
+
+    # need to store the wheel, otherwise the process goes woo!
+    $self->_wheel($wheel);
+}
+
+sub install_from_local {
+    my ($k, $self) = @_[KERNEL, HEAP];
+    my $name = $self->name;
+
+    # check whether there's another rpm transaction
+    if ( $rpm_locked ) {
+        $self->_log_prefixed_lines("waiting for rpm lock... (owned by $rpm_locked)");
+        $k->delay( install_from_local => 1 );
+        return;
+    }
+    $rpm_locked = $name;
+
+    # preparing command
+    my $rpm = $self->_rpm;
+    my $cmd = "sudo rpm -Uv $rpm";
+    $self->_log_new_step('Installing from local', "Running command: $cmd" );
+
+    # running command
+    $self->_output('');
+    $ENV{LC_ALL} = 'C';
+    my $wheel = POE::Wheel::Run->new(
+        Program      => $cmd,
+        StdoutEvent  => '_stdout',
+        StderrEvent  => '_stderr',
+        StdoutFilter => POE::Filter::Line->new,
+        StderrFilter => POE::Filter::Line->new,
+    );
+    $k->sig( CHLD => '_install_from_local' );
 
     # need to store the wheel, otherwise the process goes woo!
     $self->_wheel($wheel);
@@ -207,6 +258,43 @@ sub is_installed {
 
 # -- private events
 
+sub _cpan2dist {
+    my ($k, $self, $id) = @_[KERNEL, HEAP, ARG0];
+    my $name = $self->name;
+
+    # terminate wheel
+    my $wheel  = $self->_wheel;
+    $self->_wheel(undef);
+
+    # check whether the package has been built correctly.
+    my $output = $self->_output;
+    my ($rpm, $srpm);
+    $rpm  = $1 if $output =~ /rpm created successfully: (.*\.rpm)/;
+    $srpm = $1 if $output =~ /srpm available: (.*\.src.rpm)/;
+
+    my ($status, @result);
+    if ( $rpm && $srpm ) {
+        $status = 1;
+        @result = (
+            "$name has been successfully built",
+            "srpm created: $srpm",
+            "rpm created:  $rpm",
+        );
+
+        # storing path to interesting files
+        $self->_rpm($rpm);
+        $self->_srpm($srpm);
+
+    } else {
+        $status = 0;
+        @result = ( "error while building $name" );
+    }
+
+    # update main application
+    $self->_log_result(@result);
+    $k->post('app', 'cpan2dist_status', $self, $status);
+}
+
 sub _find_prereqs {
     my ($k, $self, $id) = @_[KERNEL, HEAP, ARG0];
 
@@ -254,6 +342,32 @@ sub _install_from_dist {
     $k->post('app', 'upstream_install', $self, !$exval);
 }
 
+
+sub _install_from_local {
+    my($k, $self, $pid, $rv) = @_[KERNEL, HEAP, ARG1, ARG2];
+
+    # since it's a sigchld handler, it also gets called for other
+    # spawned processes. therefore, screen out processes that are
+    # not related to this object.
+    return unless defined $self->_wheel;
+    return unless $self->_wheel->PID == $pid;
+
+    # terminate wheel
+    $self->_wheel(undef);
+
+    # release rpm lock
+    $rpm_locked = '';
+
+    # log result
+    my $name  = $self->name;
+    my $rpm   = $self->_rpm;
+    my $exval = $rv >> 8;
+    my $status = $exval ? 'not been' : 'been';
+    $self->_log_result( "$name has $status installed from $rpm." );
+    $k->post('app', 'local_install', $self, !$exval);
+}
+
+
 sub _is_in_dist {
     my($k, $self, $pid, $rv) = @_[KERNEL, HEAP, ARG1, ARG2];
 
@@ -296,6 +410,7 @@ sub _start {
     my ($k, $self) = @_[KERNEL, HEAP];
 
     $k->alias_set($self);
+    $k->alias_set($self->name);
     $k->post('ui',  'module_spawned', $self);
     $k->post('app', 'module_spawned', $self);
 }
@@ -370,8 +485,7 @@ It will return the POE id of the session newly created.
 
 =head2 cpan2dist()
 
-Build B<and> install a native package for this module, using
-C<cpan2dist> with the C<--install> flag.
+Build a native package for this module, using C<cpan2dist> with the C<--force> flag.
 
 
 =head2 find_prereqs()
@@ -382,6 +496,11 @@ Start looking for any other module needed by current module.
 =head2 install_from_dist()
 
 Try to install module from upstream distribution.
+
+
+=head2 install_from_local()
+
+Try to install module from package freshly build.
 
 
 =head2 is_in_dist()
@@ -403,8 +522,6 @@ available, but should not be used directly:
 =over 4
 
 =item name() - the module name
-
-=item shortname() - the module shortname (only capital letters)
 
 =back
 
