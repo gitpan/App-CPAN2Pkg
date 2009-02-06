@@ -69,6 +69,7 @@ sub spawn {
     my $session = POE::Session->create(
         inline_states => {
             # public events
+            cpan2dist         => \&cpan2dist,
             find_prereqs      => \&find_prereqs,
             install_from_dist => \&install_from_dist,
             is_in_dist        => \&is_in_dist,
@@ -81,7 +82,7 @@ sub spawn {
             _stdout            => \&_stdout,
             # poe inline states
             _start => \&_start,
-            _stop  => sub { warn "stop"; },
+            #_stop  => sub { warn "stop " . $_[HEAP]->name . "\n"; },
         },
         heap => $obj,
     );
@@ -93,6 +94,12 @@ sub spawn {
 # SUBS
 
 # -- public events
+
+sub cpan2dist {
+    my ($k, $self) = @_[KERNEL, HEAP];
+    my $name = $self->name;
+    warn "running: cpan2dist $name\n";
+}
 
 sub find_prereqs {
     my ($k, $self) = @_[KERNEL, HEAP];
@@ -195,7 +202,7 @@ sub is_installed {
     my $is_installed = $@ eq '';
     my $status = $is_installed ? 'installed' : 'not installed';
     $self->_log_result("$name is $status locally.");
-    $k->post('app', 'install_status', $self, $is_installed);
+    $k->post('app', 'local_status', $self, $is_installed);
 }
 
 # -- private events
@@ -360,6 +367,12 @@ It will return the POE id of the session newly created.
 
 
 =head1 PUBLIC EVENTS ACCEPTED
+
+=head2 cpan2dist()
+
+Build B<and> install a native package for this module, using
+C<cpan2dist> with the C<--install> flag.
+
 
 =head2 find_prereqs()
 

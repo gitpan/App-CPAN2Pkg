@@ -20,6 +20,7 @@ use Class::XSAccessor
         _lb       => '_listbox',
         _listbox  => '_listbox',
         _panes    => '_panes',
+        _missing  => '_missing',
         _viewers  => '_viewers',
         _win      => '_win',
         _opts     => '_opts',
@@ -40,6 +41,7 @@ sub spawn {
     my $self = $class->_new(
         _opts    => $opts,
         _panes   => {},
+        _missing => {},
         _viewers => {},
     );
 
@@ -52,9 +54,10 @@ sub spawn {
             append           => \&append,
             module_available => \&module_available,
             module_spawned   => \&module_spawned,
+            prereqs          => \&prereqs,
             # inline states
             _start => \&_start,
-            _stop  => sub { warn "_stop"; },
+            #_stop  => sub { warn "stop ui\n"; },
         },
     );
     return $cui;
@@ -89,23 +92,43 @@ sub module_spawned {
     # updating list of modules
     my $lb = $self->_listbox;
     my $values = $lb->values;
-    my $pos = scalar @$values;
+    push @$values, $module;
     $lb->add_labels( { $module => "- $name" } );
-    $lb->insert_at($pos, $module);
+    $lb->values([ sort { $a->name cmp $b->name } @$values ]);
     $lb->draw;
 
     # adding a new pane
     my $win = $self->_win;
     my $pane = $win->add(undef, 'Window');
 
-    my $label = $pane->add(
+    # title
+    $pane->add(
         undef, 'Label',
         -height => 1,
         -text   => $name,
     );
+
+    # prereqs
+    my $text = 'Missing prereqs: ';
+    my $a = $pane->add(
+        undef, 'Label',
+        '-y'    => 2,
+        -width  => length($text),
+        -height => 1,
+        -text   => $text,
+    );
+    my $missing = $pane->add(
+        undef, 'Label',
+        -x      => length($text),
+        '-y'    => 2,
+        -height => 1,
+    );
+    $missing->text('unknown');
+
+    # viewer
     my $viewer = $pane->add(
         undef, 'TextViewer',
-        '-y'        => 2,
+        '-y'        => 4,
         -text       => '',
         -vscrollbar => 1,
     );
@@ -114,7 +137,8 @@ sub module_spawned {
     #$self->_set_bindings($viewer);
 
     # storing the new ui elements
-    $self->_panes->{$name} = $pane;
+    $self->_panes->{$name}   = $pane;
+    $self->_missing->{$name} = $missing;
     $self->_viewers->{$name} = $viewer;
 
     # forcing redraw if needed
@@ -127,13 +151,30 @@ sub module_spawned {
 }
 
 sub module_available {
-    my ($cui, $module) = @_[HEAP, ARG0];
+    my ($k, $cui, $module) = @_[KERNEL, HEAP, ARG0];
     my $self = $cui->userdata;
 
+    # update list of modules
     my $name = $module->name;
     my $lb = $self->_listbox;
     $lb->add_labels( { $module => "+ $name" } );
     $lb->draw;
+}
+
+sub prereqs {
+    my ($cui, $module, @prereqs) = @_[HEAP, ARG0..$#_];
+    my $self = $cui->userdata;
+
+    my $name  = $module->name;
+    my $label = $self->_missing->{$name};
+    if ( @prereqs ) {
+        $label->set_color_fg('red');
+        $label->text(join ', ', sort @prereqs);
+
+    } else {
+        $label->set_color_fg('green');
+        $label->text('none');
+    }
 }
 
 
@@ -295,6 +336,10 @@ Sent when a new module has been requested to be packaged. The argment
 C<$module> is a C<App::CPAN2Pkg::Module> object with all the needed
 information.
 
+
+=head2 prereqs( $module, @prereqs )
+
+Update the missing C<@prereqs> of C<$module> in the ui.
 
 
 =head1 SEE ALSO

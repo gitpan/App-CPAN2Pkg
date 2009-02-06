@@ -23,29 +23,32 @@ use Class::XSAccessor
     };
 use POE;
 
-our $VERSION = '0.3.0';
+our $VERSION = '0.3.1';
 
 sub spawn {
     my ($class, $opts) = @_;
 
+    # create the heap object
     my $obj = App::CPAN2Pkg->_new(
         _complete => {},
-        _missing  => {},
-        _module   => {},
-        _prereq   => {},
+        _missing  => {}, # hoh: {a}{b}=1   mod a needs b
+        _module   => {}, #      {name}=obj store the objects
+        _prereq   => {}, # hoh: {a}{b}=1   mod a is a prereq of b
     );
+
+    # create the main session
     my $session = POE::Session->create(
         inline_states => {
             # public events
             upstream_status      => \&upstream_status,
-            install_status       => \&install_status,
+            local_status         => \&local_status,
             module_spawned       => \&module_spawned,
             package              => \&package,
             prereqs              => \&prereqs,
             upstream_install     => \&upstream_install,
             # poe inline states
             _start => \&_start,
-            _stop  => sub { warn "stop"; },
+            #_stop  => sub { warn "stop app\n"; },
         },
         args => $opts,
         heap => $obj,
@@ -79,16 +82,40 @@ sub spawn {
 
 # -- public events
 
-sub install_status {
-    my ($k, $module, $is_installed) = @_[KERNEL, ARG0, ARG1];
+sub local_status {
+    my ($k, $h, $module, $is_installed) = @_[KERNEL, HEAP, ARG0, ARG1];
 
     if ( not $is_installed ) {
+        # module is not installed locally, check if
+        # it's available upstream.
         $k->post($module, 'is_in_dist');
         return;
     }
 
+    # module is already installed locally.
     $k->post('ui', 'module_available', $module);
-    # update prereqs
+    $k->post('ui', 'prereqs', $module);
+
+    # module available: nothing depends on it anymore.
+    my $name = $module->name;
+    my $depends = delete $h->_prereq->{$name};
+    my @depends = keys %$depends;
+
+    # update all modules that were depending on it
+    my $missing = $h->_missing;
+    foreach my $m ( @depends ) {
+        # remove dependency on module
+        my $mobj = $h->_module->{$m};
+        my $missed = $missing->{$m};
+        delete $missed->{$name};
+        $k->post('ui', 'prereqs', $mobj, keys %$missed);
+
+        if ( scalar keys %$missed == 0 ) {
+            # huzzah! no more missing prereqs - let's create a
+            # native package for it.
+            $k->post($mobj, 'cpan2dist');
+        }
+    }
 }
 
 sub module_spawned {
@@ -115,6 +142,7 @@ sub prereqs {
         push @missing, $m unless exists $h->_complete->{$m};
     }
 
+    $k->post('ui', 'prereqs', $module, @missing);
     if ( @missing ) {
         # module misses some prereqs - wait for them.
         my $name = $module->name;
@@ -123,14 +151,14 @@ sub prereqs {
 
     } else {
         # no prereqs, move on
-        $k->yield('prereqs_completed', $module);
+        $k->post($module, 'cpan2dist');
         return;
     }
 }
 
 sub upstream_install {
     my ($k, $module, $success) = @_[KERNEL, ARG0, ARG1];
-    #update prereqs
+    #FIXME: update prereqs
 }
 
 sub upstream_status {
@@ -208,7 +236,7 @@ A list of modules to start packaging.
 The following events are the module's API.
 
 
-=head2 install_status( $module, $is_installed )
+=head2 local_status( $module, $is_installed )
 
 Sent when C<$module> knows whether it is installed locally (C<$is_installed>
 set to true) or not.
