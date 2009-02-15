@@ -23,7 +23,7 @@ use Class::XSAccessor
     };
 use POE;
 
-our $VERSION = '0.4.0';
+our $VERSION = '0.4.1';
 
 sub spawn {
     my ($class, $opts) = @_;
@@ -42,6 +42,7 @@ sub spawn {
             # public events
             cpan2dist_status     => \&cpan2dist_status,
             upstream_status      => \&upstream_status,
+            local_install        => \&local_install,
             local_status         => \&local_status,
             module_spawned       => \&module_spawned,
             package              => \&package,
@@ -91,6 +92,44 @@ sub cpan2dist_status {
 }
 
 
+sub local_install {
+    my ($k, $h, $module, $success) = @_[KERNEL, HEAP, ARG0, ARG1];
+
+    if ( not $success ) {
+        # module has not been installed locally.
+        # FIXME: ask user
+        return;
+    }
+
+    # module has been installed locally.
+    $k->post('ui', 'module_available', $module);
+
+    # module available: nothing depends on it anymore.
+    my $name = $module->name;
+    $h->_complete->{$name} = 1;
+    my $depends = delete $h->_prereq->{$name};
+    my @depends = keys %$depends;
+
+    # update all modules that were depending on it
+    my $missing = $h->_missing;
+    foreach my $m ( @depends ) {
+        # remove dependency on module
+        my $mobj = $h->_module->{$m};
+        my $missed = $missing->{$m};
+        delete $missed->{$name};
+        $k->post('ui', 'prereqs', $mobj, keys %$missed);
+
+        if ( scalar keys %$missed == 0 ) {
+            # huzzah! no more missing prereqs - let's create a
+            # native package for it.
+            $k->post($mobj, 'cpan2dist');
+        }
+    }
+
+    # FIXME: import package upstream
+}
+
+
 sub local_status {
     my ($k, $h, $module, $is_installed) = @_[KERNEL, HEAP, ARG0, ARG1];
 
@@ -107,6 +146,7 @@ sub local_status {
 
     # module available: nothing depends on it anymore.
     my $name = $module->name;
+    $h->_complete->{$name} = 1;
     my $depends = delete $h->_prereq->{$name};
     my @depends = keys %$depends;
 
@@ -167,6 +207,7 @@ sub prereqs {
 
 sub upstream_install {
     my ($k, $module, $success) = @_[KERNEL, ARG0, ARG1];
+    #$h->_complete->{$name} = 1;
     #FIXME: update prereqs
 }
 
@@ -249,6 +290,11 @@ The following events are the module's API.
 
 Sent when C<$module> has been C<cpan2dist>-ed, with C<$success> being true
 if everything went fine.
+
+
+=head2 local_install( $module, $success )
+
+Sent when C<$module> has been installed locally, with C<$success> return value.
 
 
 =head2 local_status( $module, $is_installed )

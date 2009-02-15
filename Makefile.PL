@@ -3,22 +3,23 @@ require 5.010;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-          'INSTALLDIRS' => 'site',
           'NAME' => 'App::CPAN2Pkg',
-          'EXE_FILES' => [
-                           'bin/cpan2pkg'
-                         ],
           'VERSION_FROM' => 'lib/App/CPAN2Pkg.pm',
           'PREREQ_PM' => {
-                           'FindBin' => 0,
-                           'Curses' => 0,
-                           'Class::XSAccessor' => 0,
                            'CPANPLUS::Shell::Default::Plugins::Prereqs' => 0,
-                           'Test::More' => 0,
-                           'Curses::UI::POE' => 0,
-                           'Hook::Output::File' => 0,
+                           'Class::XSAccessor' => 0,
+                           'Curses' => 0,
                            'Curses::UI' => 0,
-                           'POE' => 0
-                         }
+                           'Curses::UI::POE' => 0,
+                           'FindBin' => 0,
+                           'Hook::Output::File' => 0,
+                           'List::MoreUtils' => 0,
+                           'POE' => 0,
+                           'Test::More' => 0
+                         },
+          'INSTALLDIRS' => 'site',
+          'EXE_FILES' => [
+                           'bin/cpan2pkg'
+                         ]
         )
 ;
