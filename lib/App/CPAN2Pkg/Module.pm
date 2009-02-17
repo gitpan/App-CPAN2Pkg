@@ -18,11 +18,13 @@ use Class::XSAccessor
     accessors   => {
         name      => 'name',
         _output    => '_output',
+        _pkgname   => '_pkgname',
         _prereqs   => '_prereqs',
         _rpm       => '_rpm',
         _srpm      => '_srpm',
         _wheel     => '_wheel',
     };
+use File::Basename  qw{ basename };
 use List::MoreUtils qw{ firstidx };
 use POE;
 use POE::Filter::Line;
@@ -67,15 +69,20 @@ sub spawn {
     my $session = POE::Session->create(
         inline_states => {
             # public events
+            available_on_bs    => \&available_on_bs,
+            build_upstream     => \&build_upstream,
             cpan2dist          => \&cpan2dist,
             find_prereqs       => \&find_prereqs,
+            import_upstream    => \&import_upstream,
             install_from_dist  => \&install_from_dist,
             install_from_local => \&install_from_local,
             is_in_dist         => \&is_in_dist,
             is_installed       => \&is_installed,
             # private events
+            _build_upstream     => \&_build_upstream,
             _cpan2dist          => \&_cpan2dist,
             _find_prereqs       => \&_find_prereqs,
+            _import_upstream    => \&_import_upstream,
             _install_from_dist  => \&_install_from_dist,
             _install_from_local => \&_install_from_local,
             _is_in_dist         => \&_is_in_dist,
@@ -95,6 +102,36 @@ sub spawn {
 # SUBS
 
 # -- public events
+
+sub available_on_bs {
+    my ($k, $self) = @_[KERNEL, HEAP];
+    $k->post('app', 'available_on_bs', $self);
+}
+
+sub build_upstream {
+    my ($k, $self) = @_[KERNEL, HEAP];
+
+    # preparing command.
+    my $name    = $self->name;
+    my $pkgname = $self->_pkgname;
+    my $cmd = "mdvsys submit $pkgname";
+    $self->_log_new_step('Submitting package upstream', "Running command: $cmd" );
+
+    # running command
+    $self->_output('');
+    $ENV{LC_ALL} = 'C';
+    my $wheel = POE::Wheel::Run->new(
+        Program      => $cmd,
+        StdoutEvent  => '_stdout',
+        StderrEvent  => '_stderr',
+        StdoutFilter => POE::Filter::Line->new,
+        StderrFilter => POE::Filter::Line->new,
+    );
+    $k->sig( CHLD => '_build_upstream' );
+
+    # need to store the wheel, otherwise the process goes woo!
+    $self->_wheel($wheel);
+}
 
 sub cpan2dist {
     my ($k, $self) = @_[KERNEL, HEAP];
@@ -125,6 +162,32 @@ sub cpan2dist {
         StdoutFilter => POE::Filter::Line->new,
         StderrFilter => POE::Filter::Line->new,
     );
+
+    # need to store the wheel, otherwise the process goes woo!
+    $self->_wheel($wheel);
+}
+
+
+sub import_upstream {
+    my ($k, $self) = @_[KERNEL, HEAP];
+
+    # preparing command.
+    my $name = $self->name;
+    my $srpm = $self->_srpm;
+    my $cmd = "mdvsys import $srpm";
+    $self->_log_new_step('Importing package upstream', "Running command: $cmd" );
+
+    # running command
+    $self->_output('');
+    $ENV{LC_ALL} = 'C';
+    my $wheel = POE::Wheel::Run->new(
+        Program      => $cmd,
+        StdoutEvent  => '_stdout',
+        StderrEvent  => '_stderr',
+        StdoutFilter => POE::Filter::Line->new,
+        StderrFilter => POE::Filter::Line->new,
+    );
+    $k->sig( CHLD => '_import_upstream' );
 
     # need to store the wheel, otherwise the process goes woo!
     $self->_wheel($wheel);
@@ -269,6 +332,28 @@ sub is_installed {
 
 # -- private events
 
+sub _build_upstream {
+    my($k, $self, $pid, $rv) = @_[KERNEL, HEAP, ARG1, ARG2];
+
+    # since it's a sigchld handler, it also gets called for other
+    # spawned processes. therefore, screen out processes that are
+    # not related to this object.
+    return unless defined $self->_wheel;
+    return unless $self->_wheel->PID == $pid;
+
+    # terminate wheel
+    $self->_wheel(undef);
+
+    # we don't have a real way to know when the build is finished,
+    # and when the package is available upstream. therefore, we're going
+    # to ask the user to signal when it's available...
+    my $name = $self->name;
+    $self->_log_result( "$name has been submitted upstream." );
+    my $question = "type 'enter' when package is available on build system upstream";
+    $k->post('ui', 'ask_user', $self, $question, 'available_on_bs');
+}
+
+
 sub _cpan2dist {
     my ($k, $self, $id) = @_[KERNEL, HEAP, ARG0];
     my $name = $self->name;
@@ -296,6 +381,11 @@ sub _cpan2dist {
         $self->_rpm($rpm);
         $self->_srpm($srpm);
 
+        # storing package name
+        my $pkgname = basename $srpm;
+        $pkgname =~ s/-\d.*$//;
+        $self->_pkgname( $pkgname );
+
     } else {
         $status = 0;
         @result = ( "error while building $name" );
@@ -305,6 +395,27 @@ sub _cpan2dist {
     $self->_log_result(@result);
     $k->post('app', 'cpan2dist_status', $self, $status);
 }
+
+sub _import_upstream {
+    my($k, $self, $pid, $rv) = @_[KERNEL, HEAP, ARG1, ARG2];
+
+    # since it's a sigchld handler, it also gets called for other
+    # spawned processes. therefore, screen out processes that are
+    # not related to this object.
+    return unless defined $self->_wheel;
+    return unless $self->_wheel->PID == $pid;
+
+    # terminate wheel
+    $self->_wheel(undef);
+
+    # log result
+    my $name  = $self->name;
+    my $exval = $rv >> 8;
+    my $status = $exval ? 'not been' : 'been';
+    $self->_log_result( "$name has $status imported upstream." );
+    $k->post('app', 'upstream_import', $self, !$exval);
+}
+
 
 sub _find_prereqs {
     my ($k, $self, $id) = @_[KERNEL, HEAP, ARG0];
@@ -493,6 +604,16 @@ It will return the POE id of the session newly created.
 
 =head1 PUBLIC EVENTS ACCEPTED
 
+=head2 available_on_bs()
+
+Sent when module is available on upstream build system.
+
+
+=head2 build_upstream()
+
+Submit package to be build on upstream build system.
+
+
 =head2 cpan2dist()
 
 Build a native package for this module, using C<cpan2dist> with the C<--force> flag.
@@ -501,6 +622,11 @@ Build a native package for this module, using C<cpan2dist> with the C<--force> f
 =head2 find_prereqs()
 
 Start looking for any other module needed by current module.
+
+
+=head2 import_upstream()
+
+Try to import module into upstream distribution.
 
 
 =head2 install_from_dist()

@@ -23,7 +23,7 @@ use Class::XSAccessor
     };
 use POE;
 
-our $VERSION = '0.4.1';
+our $VERSION = '0.5.0';
 
 sub spawn {
     my ($class, $opts) = @_;
@@ -40,6 +40,7 @@ sub spawn {
     my $session = POE::Session->create(
         inline_states => {
             # public events
+            available_on_bs      => \&available_on_bs,
             cpan2dist_status     => \&cpan2dist_status,
             upstream_status      => \&upstream_status,
             local_install        => \&local_install,
@@ -47,6 +48,7 @@ sub spawn {
             module_spawned       => \&module_spawned,
             package              => \&package,
             prereqs              => \&prereqs,
+            upstream_import      => \&upstream_import,
             upstream_install     => \&upstream_install,
             # poe inline states
             _start => \&_start,
@@ -83,6 +85,11 @@ sub spawn {
 # fi
 
 # -- public events
+
+sub available_on_bs {
+    # FIXME: start submitting upstream what depends on this
+}
+
 
 sub cpan2dist_status {
     my ($k, $h, $module, $status) = @_[KERNEL, HEAP, ARG0, ARG1];
@@ -126,7 +133,7 @@ sub local_install {
         }
     }
 
-    # FIXME: import package upstream
+    $k->post($module, 'import_upstream');
 }
 
 
@@ -211,6 +218,15 @@ sub upstream_install {
     #FIXME: update prereqs
 }
 
+
+sub upstream_import {
+    my ($k, $module, $success) = @_[KERNEL, ARG0, ARG1];
+    # FIXME: what if wrong
+    # FIXME: don't submit if missing deps on bs
+    $k->post($module, 'build_upstream');
+}
+
+
 sub upstream_status {
     my ($k, $module, $is_available) = @_[KERNEL, ARG0, ARG1];
     my $event = $is_available ? 'install_from_dist' : 'find_prereqs';
@@ -286,6 +302,11 @@ A list of modules to start packaging.
 The following events are the module's API.
 
 
+=head2 available_on_bs()
+
+Sent when module is available on upstream build system.
+
+
 =head2 cpan2dist_status( $module, $success )
 
 Sent when C<$module> has been C<cpan2dist>-ed, with C<$success> being true
@@ -319,6 +340,11 @@ deep inside said distribution.
 
 Inform main application that C<$module> needs some C<@prereqs> (possibly
 empty).
+
+
+=head2 upstream_import( $module, $success )
+
+Sent when C<$module> package has been imported in upstream repository.
 
 
 =head2 upstream_install( $module, $success )
