@@ -21,6 +21,7 @@ my %requires = (
     'Curses::UI::POE'    => 0,
     'File::Basename'     => 0,
     'FindBin'            => 0,
+    'Getopt::Euclid'     => 0,
     'Hook::Output::File' => 0,
     'List::MoreUtils'    => 0,
     'POE'                => 0,
@@ -47,6 +48,11 @@ my $builder = Module::Build->new(
         'App-CPAN2Pkg-*', map { ( '*/' x $_ ) . '*~' } 0..5
     ],
     create_makefile_pl => 'traditional',
+    meta_merge => {
+        resources => {
+            repository => 'http://repo.or.cz/w/app-cpan2pkg.git',
+        },
+    },
 );
 
 $builder->create_build_script();

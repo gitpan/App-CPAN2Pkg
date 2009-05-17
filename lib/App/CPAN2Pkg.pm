@@ -13,27 +13,22 @@ use strict;
 use warnings;
 
 use App::CPAN2Pkg::Module;
+use App::CPAN2Pkg::Worker;
 use Class::XSAccessor
     constructor => '_new',
     accessors   => {
-        _complete  => '_complete',
-        _missing   => '_missing',
         _module    => '_module',
-        _prereq    => '_prereq',
     };
 use POE;
 
-our $VERSION = '0.5.0';
+our $VERSION = '1.0.0';
 
 sub spawn {
     my ($class, $opts) = @_;
 
     # create the heap object
     my $obj = App::CPAN2Pkg->_new(
-        _complete => {},
-        _missing  => {}, # hoh: {a}{b}=1   mod a needs b
         _module   => {}, #      {name}=obj store the objects
-        _prereq   => {}, # hoh: {a}{b}=1   mod a is a prereq of b
     );
 
     # create the main session
@@ -113,20 +108,19 @@ sub local_install {
 
     # module available: nothing depends on it anymore.
     my $name = $module->name;
-    $h->_complete->{$name} = 1;
-    my $depends = delete $h->_prereq->{$name};
-    my @depends = keys %$depends;
+    $module->is_local(1);
+    my @depends = $module->blocking_list;
+    $module->blocking_clear;
 
     # update all modules that were depending on it
-    my $missing = $h->_missing;
     foreach my $m ( @depends ) {
         # remove dependency on module
         my $mobj = $h->_module->{$m};
-        my $missed = $missing->{$m};
-        delete $missed->{$name};
-        $k->post('ui', 'prereqs', $mobj, keys %$missed);
+        $mobj->missing_del($name);
+        my @missing = $mobj->missing_list;
+        $k->post('ui', 'prereqs', $mobj, @missing);
 
-        if ( scalar keys %$missed == 0 ) {
+        if ( scalar @missing == 0 ) {
             # huzzah! no more missing prereqs - let's create a
             # native package for it.
             $k->post($mobj, 'cpan2dist');
@@ -153,20 +147,20 @@ sub local_status {
 
     # module available: nothing depends on it anymore.
     my $name = $module->name;
-    $h->_complete->{$name} = 1;
-    my $depends = delete $h->_prereq->{$name};
-    my @depends = keys %$depends;
+    $module->is_local(1);
+    $module->is_avail_on_bs(1);
+    my @depends = $module->blocking_list;
+    $module->blocking_clear;
 
     # update all modules that were depending on it
-    my $missing = $h->_missing;
     foreach my $m ( @depends ) {
         # remove dependency on module
         my $mobj = $h->_module->{$m};
-        my $missed = $missing->{$m};
-        delete $missed->{$name};
-        $k->post('ui', 'prereqs', $mobj, keys %$missed);
+        $mobj->missing_del($name);
+        my @missing = $mobj->missing_list;
+        $k->post('ui', 'prereqs', $mobj, @missing);
 
-        if ( scalar keys %$missed == 0 ) {
+        if ( scalar @missing == 0 ) {
             # huzzah! no more missing prereqs - let's create a
             # native package for it.
             $k->post($mobj, 'cpan2dist');
@@ -183,7 +177,7 @@ sub module_spawned {
 
 sub package {
     my ($k, $h, $module) = @_[KERNEL, HEAP, ARG0];
-    App::CPAN2Pkg::Module->spawn($module);
+    App::CPAN2Pkg::Worker->spawn($module);
 }
 
 sub prereqs {
@@ -192,18 +186,22 @@ sub prereqs {
     my @missing;
     foreach my $m ( @prereqs ) {
         # check if module is new. in which case, let's treat it.
-        $k->yield('package', $m) unless exists $h->_module->{$m};
+        if ( ! exists $h->_module->{$m} ) {
+            my $mobj = App::CPAN2Pkg::Module->new( name => $m );
+            $k->yield('package', $mobj);
+            $h->_module->{$m} = $mobj;
+        }
 
         # store missing module.
-        push @missing, $m unless exists $h->_complete->{$m};
+        push @missing, $m unless $h->_module->{$m}->is_local;
     }
 
     $k->post('ui', 'prereqs', $module, @missing);
     if ( @missing ) {
         # module misses some prereqs - wait for them.
         my $name = $module->name;
-        $h->_missing->{$name}{$_} = 1 for @missing;
-        $h->_prereq->{$_}{$name}  = 1 for @missing;
+        $module->missing_add($_)               for @missing;
+        $h->_module->{$_}->blocking_add($name) for @missing;
 
     } else {
         # no prereqs, move on
@@ -213,16 +211,47 @@ sub prereqs {
 }
 
 sub upstream_install {
-    my ($k, $module, $success) = @_[KERNEL, ARG0, ARG1];
-    #$h->_complete->{$name} = 1;
-    #FIXME: update prereqs
+    my ($k, $h, $module, $success) = @_[KERNEL, HEAP, ARG0, ARG1];
+
+    # FIXME: what if $success is a failure?
+
+    # module is already installed locally.
+    $k->post('ui', 'module_available', $module);
+    $k->post('ui', 'prereqs', $module);
+
+    # module available: nothing depends on it anymore.
+    my $name = $module->name;
+    $module->is_local(1);
+    my @depends = $module->blocking_list;
+    $module->blocking_clear;
+
+    # update all modules that were depending on it
+    foreach my $m ( @depends ) {
+        # remove dependency on module
+        my $mobj = $h->_module->{$m};
+        $mobj->missing_del($name);
+        my @missing = $mobj->missing_list;
+        $k->post('ui', 'prereqs', $mobj, @missing);
+
+        if ( scalar @missing == 0 ) {
+            # huzzah! no more missing prereqs - let's create a
+            # native package for it.
+            $k->post($mobj, 'cpan2dist');
+        }
+    }
 }
 
 
 sub upstream_import {
-    my ($k, $module, $success) = @_[KERNEL, ARG0, ARG1];
+    my ($k, $h, $module, $success) = @_[KERNEL, HEAP, ARG0, ARG1];
     # FIXME: what if wrong
-    # FIXME: don't submit if missing deps on bs
+    my $prereqs = $module->prereqs;
+    foreach my $m ( @$prereqs ) {
+        my $mobj = $h->_module->{$m};
+        next if $mobj->is_avail_on_bs;
+        $k->delay( upstream_import => 30, $module, $success );
+        return;
+    }
     $k->post($module, 'build_upstream');
 }
 
@@ -242,7 +271,10 @@ sub _start {
 
     # start packaging some modules
     my $modules = $opts->{modules};
-    $k->yield('package', $_) for @$modules;
+    foreach my $name ( @$modules ) {
+        my $module = App::CPAN2Pkg::Module->new( name => $name );
+        $k->yield('package', $module);
+    }
 }
 
 
@@ -331,9 +363,8 @@ Sent when C<$module> has been spawned successfully.
 
 =head2 package( $module )
 
-Request the application to package (if needed) the perl C<$module>. Note
-that the module can be either the top-most module of a distribution or
-deep inside said distribution.
+Request the application to package (if needed) a C<$module> (an
+C<App::CPAN2Pkg::Module> object).
 
 
 =head2 prereqs( $module, @prereqs )
