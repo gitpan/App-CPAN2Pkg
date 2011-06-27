@@ -12,7 +12,7 @@ use warnings;
 
 package App::CPAN2Pkg::Lock;
 BEGIN {
-  $App::CPAN2Pkg::Lock::VERSION = '2.111780';
+  $App::CPAN2Pkg::Lock::VERSION = '2.111781';
 }
 # ABSTRACT:
 
@@ -69,7 +69,7 @@ App::CPAN2Pkg::Lock - use Moose;
 
 =head1 VERSION
 
-version 2.111780
+version 2.111781
 
 =head1 SYNOPSIS
 

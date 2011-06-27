@@ -21,7 +21,7 @@ my %module_build_args = (
     'Jerome Quelin <jquelin@gmail.com>'
   ],
   'dist_name' => 'App-CPAN2Pkg',
-  'dist_version' => '2.111780',
+  'dist_version' => '2.111781',
   'license' => 'perl',
   'module_name' => 'App::CPAN2Pkg',
   'recommends' => {},
@@ -46,6 +46,7 @@ my %module_build_args = (
     'POE' => '0',
     'POE::Component::Client::HTTP' => '0',
     'POE::Kernel' => '0',
+    'POE::Loop::Tk' => '0',
     'POE::Wheel::Run' => '0',
     'Path::Class' => '0',
     'Readonly' => '0',

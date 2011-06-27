@@ -12,7 +12,7 @@ use warnings;
 
 package App::CPAN2Pkg::Tk::Main;
 BEGIN {
-  $App::CPAN2Pkg::Tk::Main::VERSION = '2.111780';
+  $App::CPAN2Pkg::Tk::Main::VERSION = '2.111781';
 }
 # ABSTRACT: main cpan2pkg window
 
@@ -386,7 +386,7 @@ App::CPAN2Pkg::Tk::Main - main cpan2pkg window
 
 =head1 VERSION
 
-version 2.111780
+version 2.111781
 
 =head1 DESCRIPTION
 

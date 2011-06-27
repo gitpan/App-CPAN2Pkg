@@ -12,7 +12,7 @@ use strict;
 
 package App::CPAN2Pkg::Types;
 BEGIN {
-  $App::CPAN2Pkg::Types::VERSION = '2.111780';
+  $App::CPAN2Pkg::Types::VERSION = '2.111781';
 }
 # ABSTRACT: types used in the distribution
 
@@ -31,7 +31,7 @@ App::CPAN2Pkg::Types - types used in the distribution
 
 =head1 VERSION
 
-version 2.111780
+version 2.111781
 
 =head1 DESCRIPTION
 

@@ -14,7 +14,7 @@ use warnings;
 
 package main;
 BEGIN {
-  $main::VERSION = '2.111780';
+  $main::VERSION = '2.111781';
 }
 # ABSTRACT: generating native linux packages from cpan
 
@@ -36,7 +36,7 @@ main - generating native linux packages from cpan
 
 =head1 VERSION
 
-version 2.111780
+version 2.111781
 
 =head1 SYNOPSIS
 

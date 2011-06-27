@@ -70,6 +70,7 @@ eval { $v .= pmver('MooseX::Singleton','any version') };
 eval { $v .= pmver('POE','any version') };
 eval { $v .= pmver('POE::Component::Client::HTTP','any version') };
 eval { $v .= pmver('POE::Kernel','any version') };
+eval { $v .= pmver('POE::Loop::Tk','any version') };
 eval { $v .= pmver('POE::Wheel::Run','any version') };
 eval { $v .= pmver('Path::Class','any version') };
 eval { $v .= pmver('Readonly','any version') };
