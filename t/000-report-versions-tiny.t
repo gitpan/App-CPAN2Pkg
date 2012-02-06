@@ -54,6 +54,7 @@ eval { $v .= pmver('Exporter::Lite','any version') };
 eval { $v .= pmver('File::Find','any version') };
 eval { $v .= pmver('File::ShareDir::PathClass','any version') };
 eval { $v .= pmver('File::Temp','any version') };
+eval { $v .= pmver('Find::Lib','any version') };
 eval { $v .= pmver('FindBin','any version') };
 eval { $v .= pmver('HTML::TreeBuilder','any version') };
 eval { $v .= pmver('HTTP::Request','any version') };
@@ -84,6 +85,8 @@ eval { $v .= pmver('Tk::PNG','any version') };
 eval { $v .= pmver('Tk::ROText','any version') };
 eval { $v .= pmver('Tk::Role::HasWidgets','any version') };
 eval { $v .= pmver('Tk::Sugar','any version') };
+eval { $v .= pmver('strict','any version') };
+eval { $v .= pmver('warnings','any version') };
 
 
 

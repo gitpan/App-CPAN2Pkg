@@ -11,8 +11,8 @@ use strict;
 use warnings;
 
 package App::CPAN2Pkg::Worker::RPM;
-BEGIN {
-  $App::CPAN2Pkg::Worker::RPM::VERSION = '2.111781';
+{
+  $App::CPAN2Pkg::Worker::RPM::VERSION = '2.120370';
 }
 # ABSTRACT: worker specialized in rpm distributions
 
@@ -143,7 +143,7 @@ App::CPAN2Pkg::Worker::RPM - worker specialized in rpm distributions
 
 =head1 VERSION
 
-version 2.111781
+version 2.120370
 
 =head1 DESCRIPTION
 

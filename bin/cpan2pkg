@@ -13,14 +13,13 @@ use strict;
 use warnings;
 
 package main;
-BEGIN {
-  $main::VERSION = '2.111781';
+{
+  $main::VERSION = '2.120370';
 }
 # ABSTRACT: generating native linux packages from cpan
 
 # for testing purposes
-use FindBin qw{ $Bin };
-use lib "$Bin/../lib";
+use Find::Lib '../lib';
 
 use App::CPAN2Pkg;
 App::CPAN2Pkg->run( @ARGV );
@@ -36,7 +35,7 @@ main - generating native linux packages from cpan
 
 =head1 VERSION
 
-version 2.111781
+version 2.120370
 
 =head1 SYNOPSIS
 

@@ -11,8 +11,8 @@ use strict;
 use warnings;
 
 package App::CPAN2Pkg::Lock;
-BEGIN {
-  $App::CPAN2Pkg::Lock::VERSION = '2.111781';
+{
+  $App::CPAN2Pkg::Lock::VERSION = '2.120370';
 }
 # ABSTRACT:
 
@@ -65,11 +65,11 @@ sub release {
 
 =head1 NAME
 
-App::CPAN2Pkg::Lock - use Moose;
+App::CPAN2Pkg::Lock
 
 =head1 VERSION
 
-version 2.111781
+version 2.120370
 
 =head1 SYNOPSIS
 

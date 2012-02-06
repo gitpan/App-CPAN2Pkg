@@ -11,8 +11,8 @@ use strict;
 use warnings;
 
 package App::CPAN2Pkg::Tk::Utils;
-BEGIN {
-  $App::CPAN2Pkg::Tk::Utils::VERSION = '2.111781';
+{
+  $App::CPAN2Pkg::Tk::Utils::VERSION = '2.120370';
 }
 # ABSTRACT: Tk utilities for gui building
 
@@ -47,7 +47,7 @@ App::CPAN2Pkg::Tk::Utils - Tk utilities for gui building
 
 =head1 VERSION
 
-version 2.111781
+version 2.120370
 
 =head1 DESCRIPTION
 

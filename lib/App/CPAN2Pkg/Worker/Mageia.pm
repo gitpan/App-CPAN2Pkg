@@ -11,8 +11,8 @@ use strict;
 use warnings;
 
 package App::CPAN2Pkg::Worker::Mageia;
-BEGIN {
-  $App::CPAN2Pkg::Worker::Mageia::VERSION = '2.111781';
+{
+  $App::CPAN2Pkg::Worker::Mageia::VERSION = '2.120370';
 }
 # ABSTRACT: worker dedicated to Mageia distribution
 
@@ -118,7 +118,7 @@ override cpan2dist_flavour => sub { "CPANPLUS::Dist::Mageia" };
         $pkg =~ s/\.src.rpm$//;
 
         my $tree  = HTML::TreeBuilder->new_from_content( $answer->as_string );
-        my $table = $tree->find_by_tag_name('table');
+        my (undef, $table) = $tree->find_by_tag_name('table');
         my $link  = $table->look_down(
             _tag => "a",
             sub {
@@ -142,7 +142,8 @@ override cpan2dist_flavour => sub { "CPANPLUS::Dist::Mageia" };
                 $K->delay( _upstream_build_package_ready => $min * 60 );
             }
             when ( "failure" ) {
-                my $url = "http://pkgsubmit.mageia.org/" . $status->attr("href");
+                my ($cell) = $cells[6]->content_list;
+                my $url = "http://pkgsubmit.mageia.org/" . $cell->attr("href");
                 $self->yield( _upstream_build_package_failed => $url );
             }
             default {
@@ -169,7 +170,7 @@ App::CPAN2Pkg::Worker::Mageia - worker dedicated to Mageia distribution
 
 =head1 VERSION
 
-version 2.111781
+version 2.120370
 
 =head1 DESCRIPTION
 

@@ -11,8 +11,8 @@ use strict;
 use warnings;
 
 package App::CPAN2Pkg::Module;
-BEGIN {
-  $App::CPAN2Pkg::Module::VERSION = '2.111781';
+{
+  $App::CPAN2Pkg::Module::VERSION = '2.120370';
 }
 # ABSTRACT: poe session to drive a module packaging
 
@@ -63,7 +63,7 @@ App::CPAN2Pkg::Module - poe session to drive a module packaging
 
 =head1 VERSION
 
-version 2.111781
+version 2.120370
 
 =head1 DESCRIPTION
 

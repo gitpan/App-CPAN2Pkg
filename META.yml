@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   Module::Build: 0.3601
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.200008, CPAN::Meta::Converter version 2.110930'
+generated_by: 'Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,45 +20,46 @@ name: App-CPAN2Pkg
 provides:
   App::CPAN2Pkg:
     file: lib/App/CPAN2Pkg.pm
-    version: 2.111781
+    version: 2.120370
   App::CPAN2Pkg::Controller:
     file: lib/App/CPAN2Pkg/Controller.pm
-    version: 2.111781
+    version: 2.120370
   App::CPAN2Pkg::Lock:
     file: lib/App/CPAN2Pkg/Lock.pm
-    version: 2.111781
+    version: 2.120370
   App::CPAN2Pkg::Module:
     file: lib/App/CPAN2Pkg/Module.pm
-    version: 2.111781
+    version: 2.120370
   App::CPAN2Pkg::Repository:
     file: lib/App/CPAN2Pkg/Repository.pm
-    version: 2.111781
+    version: 2.120370
   App::CPAN2Pkg::Tk::Main:
     file: lib/App/CPAN2Pkg/Tk/Main.pm
-    version: 2.111781
+    version: 2.120370
   App::CPAN2Pkg::Tk::Utils:
     file: lib/App/CPAN2Pkg/Tk/Utils.pm
-    version: 2.111781
+    version: 2.120370
   App::CPAN2Pkg::Types:
     file: lib/App/CPAN2Pkg/Types.pm
-    version: 2.111781
+    version: 2.120370
   App::CPAN2Pkg::Utils:
     file: lib/App/CPAN2Pkg/Utils.pm
-    version: 2.111781
+    version: 2.120370
   App::CPAN2Pkg::Worker:
     file: lib/App/CPAN2Pkg/Worker.pm
-    version: 2.111781
+    version: 2.120370
   App::CPAN2Pkg::Worker::Mageia:
     file: lib/App/CPAN2Pkg/Worker/Mageia.pm
-    version: 2.111781
+    version: 2.120370
   App::CPAN2Pkg::Worker::RPM:
     file: lib/App/CPAN2Pkg/Worker/RPM.pm
-    version: 2.111781
+    version: 2.120370
 requires:
   DateTime: 0
   Devel::Platform::Info::Linux: 0
   Exporter::Lite: 0
   File::ShareDir::PathClass: 0
+  Find::Lib: 0
   FindBin: 0
   HTML::TreeBuilder: 0
   HTTP::Request: 0
@@ -87,11 +88,13 @@ requires:
   Tk::Role::HasWidgets: 0
   Tk::Sugar: 0
   perl: 5.012
+  strict: 0
+  warnings: 0
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=App-CPAN2Pkg
   homepage: http://search.cpan.org/dist/App-CPAN2Pkg/
   repository: git://github.com/jquelin/app-cpan2pkg.git
-version: 2.111781
+version: 2.120370
 x_Dist_Zilla:
   plugins:
     -
@@ -101,19 +104,19 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: 4.200008
+      version: 4.300006
     -
       class: Dist::Zilla::Plugin::AutoVersion
       name: '@JQUELIN/AutoVersion'
-      version: 4.200008
+      version: 4.300006
     -
       class: Dist::Zilla::Plugin::GatherDir
       name: '@JQUELIN/GatherDir'
-      version: 4.200008
+      version: 4.300006
     -
       class: Dist::Zilla::Plugin::CompileTests
       name: '@JQUELIN/CompileTests'
-      version: 1.110930
+      version: 1.112820
     -
       class: Dist::Zilla::Plugin::HasVersionTests
       name: '@JQUELIN/HasVersionTests'
@@ -121,19 +124,19 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::KwaliteeTests
       name: '@JQUELIN/KwaliteeTests'
-      version: 1.101420
+      version: 2.03
     -
       class: Dist::Zilla::Plugin::MinimumVersionTests
       name: '@JQUELIN/MinimumVersionTests'
-      version: 1.101421
+      version: 2.0.1
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: '@JQUELIN/PodCoverageTests'
-      version: 4.200008
+      version: 4.300006
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@JQUELIN/PodSyntaxTests'
-      version: 4.200008
+      version: 4.300006
     -
       class: Dist::Zilla::Plugin::ReportVersions::Tiny
       name: '@JQUELIN/ReportVersions::Tiny'
@@ -141,31 +144,31 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@JQUELIN/PruneCruft'
-      version: 4.200008
+      version: 4.300006
     -
       class: Dist::Zilla::Plugin::PruneFiles
       name: '@JQUELIN/PruneFiles'
-      version: 4.200008
+      version: 4.300006
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@JQUELIN/ManifestSkip'
-      version: 4.200008
+      version: 4.300006
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@JQUELIN/AutoPrereqs'
-      version: 4.200008
+      version: 4.300006
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@JQUELIN/ExtraTests'
-      version: 4.200008
+      version: 4.300006
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@JQUELIN/NextRelease'
-      version: 4.200008
+      version: 4.300006
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: '@JQUELIN/PkgVersion'
-      version: 4.200008
+      version: 4.300006
     -
       class: Dist::Zilla::Plugin::PodWeaver
       name: '@JQUELIN/PodWeaver'
@@ -173,15 +176,15 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Prepender
       name: '@JQUELIN/Prepender'
-      version: 1.103470
+      version: 1.112280
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@JQUELIN/ExecDir'
-      version: 4.200008
+      version: 4.300006
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@JQUELIN/ShareDir'
-      version: 4.200008
+      version: 4.300006
     -
       class: Dist::Zilla::Plugin::Bugtracker
       name: '@JQUELIN/Bugtracker'
@@ -201,31 +204,31 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@JQUELIN/MetaConfig'
-      version: 4.200008
+      version: 4.300006
     -
       class: Dist::Zilla::Plugin::License
       name: '@JQUELIN/License'
-      version: 4.200008
+      version: 4.300006
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@JQUELIN/MetaYAML'
-      version: 4.200008
+      version: 4.300006
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@JQUELIN/MetaJSON'
-      version: 4.200008
+      version: 4.300006
     -
       class: Dist::Zilla::Plugin::ModuleBuild
       name: '@JQUELIN/ModuleBuild'
-      version: 4.200008
+      version: 4.300006
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@JQUELIN/Readme'
-      version: 4.200008
+      version: 4.300006
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@JQUELIN/Manifest'
-      version: 4.200008
+      version: 4.300006
     -
       class: Dist::Zilla::Plugin::CheckChangeLog
       name: '@JQUELIN/CheckChangeLog'
@@ -233,57 +236,57 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Git::Check
       name: '@JQUELIN/Git::Check'
-      version: 1.111590
+      version: 1.113560
     -
       class: Dist::Zilla::Plugin::Git::Commit
       name: '@JQUELIN/Git::Commit'
-      version: 1.111590
+      version: 1.113560
     -
       class: Dist::Zilla::Plugin::Git::CommitBuild
       name: '@JQUELIN/Git::CommitBuild'
-      version: 1.111590
+      version: 1.113560
     -
       class: Dist::Zilla::Plugin::Git::Tag
       name: '@JQUELIN/TagMaster'
-      version: 1.111590
+      version: 1.113560
     -
       class: Dist::Zilla::Plugin::Git::Tag
       name: '@JQUELIN/TagRelease'
-      version: 1.111590
+      version: 1.113560
     -
       class: Dist::Zilla::Plugin::Git::Push
       name: '@JQUELIN/Git::Push'
-      version: 1.111590
+      version: 1.113560
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@JQUELIN/UploadToCPAN'
-      version: 4.200008
+      version: 4.300006
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: 4.200008
+      version: 4.300006
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: 4.200008
+      version: 4.300006
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: 4.200008
+      version: 4.300006
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: 4.200008
+      version: 4.300006
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: 4.200008
+      version: 4.300006
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: 4.200008
+      version: 4.300006
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: 0
-    version: 4.200008
+    version: 4.300006
