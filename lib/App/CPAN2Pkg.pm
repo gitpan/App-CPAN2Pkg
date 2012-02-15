@@ -12,7 +12,7 @@ use warnings;
 
 package App::CPAN2Pkg;
 {
-  $App::CPAN2Pkg::VERSION = '2.120370';
+  $App::CPAN2Pkg::VERSION = '2.120460';
 }
 # ABSTRACT: generating native linux packages from cpan
 
@@ -87,7 +87,7 @@ App::CPAN2Pkg - generating native linux packages from cpan
 
 =head1 VERSION
 
-version 2.120370
+version 2.120460
 
 =head1 SYNOPSIS
 

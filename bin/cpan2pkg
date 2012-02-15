@@ -12,9 +12,9 @@ use 5.012;
 use strict;
 use warnings;
 
-package main;
+package cpan2pkg;
 {
-  $main::VERSION = '2.120370';
+  $cpan2pkg::VERSION = '2.120460';
 }
 # ABSTRACT: generating native linux packages from cpan
 
@@ -31,11 +31,11 @@ exit;
 
 =head1 NAME
 
-main - generating native linux packages from cpan
+cpan2pkg - generating native linux packages from cpan
 
 =head1 VERSION
 
-version 2.120370
+version 2.120460
 
 =head1 SYNOPSIS
 

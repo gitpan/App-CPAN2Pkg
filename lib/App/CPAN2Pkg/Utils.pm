@@ -12,7 +12,7 @@ use warnings;
 
 package App::CPAN2Pkg::Utils;
 {
-  $App::CPAN2Pkg::Utils::VERSION = '2.120370';
+  $App::CPAN2Pkg::Utils::VERSION = '2.120460';
 }
 # ABSTRACT: various utilities for cpan2pkg
 
@@ -41,7 +41,7 @@ App::CPAN2Pkg::Utils - various utilities for cpan2pkg
 
 =head1 VERSION
 
-version 2.120370
+version 2.120460
 
 =head1 DESCRIPTION
 

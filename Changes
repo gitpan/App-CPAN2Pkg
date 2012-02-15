@@ -1,5 +1,8 @@
 Revision history for App-CPAN2Pkg
 
+2.120460  2012-02-15 09:39:46 Europe/Paris
+ - fix pod name of bin/cpan2pkg
+
 2.120370  2012-02-06 09:53:42 Europe/Paris
  - reflect new page layout of pkgsubmit.mageia.org
 
