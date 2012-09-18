@@ -12,7 +12,7 @@ use warnings;
 
 package App::CPAN2Pkg::Worker::RPM;
 {
-  $App::CPAN2Pkg::Worker::RPM::VERSION = '2.120460';
+  $App::CPAN2Pkg::Worker::RPM::VERSION = '2.122620';
 }
 # ABSTRACT: worker specialized in rpm distributions
 
@@ -41,6 +41,17 @@ class_has rpmlock => ( ro, isa=>'App::CPAN2Pkg::Lock', default=>sub{ App::CPAN2P
 
 has srpm => ( rw, isa=>'Path::Class::File' );
 has rpm  => ( rw, isa=>'Path::Class::File' );
+has pkgname => ( rw, isa=>'Str', lazy_build );
+
+
+# -- initialization
+
+sub _build_pkgname {
+    my $self = shift;
+    my $pkgname = $self->srpm->basename;
+    $pkgname =~ s/-\d.*$//;
+    return $pkgname;
+}
 
 
 # -- cpan2pkg logic implementation
@@ -134,6 +145,7 @@ no Moose;
 __PACKAGE__->meta->make_immutable;
 1;
 
+__END__
 
 =pod
 
@@ -143,7 +155,7 @@ App::CPAN2Pkg::Worker::RPM - worker specialized in rpm distributions
 
 =head1 VERSION
 
-version 2.120460
+version 2.122620
 
 =head1 DESCRIPTION
 
@@ -176,6 +188,10 @@ Path to the RPM of the module built with C<cpan2dist>.
 Try to get a hold on RPM lock. Fire C<$event> if lock was grabbed
 successfully, otherwise wait 5 seconds before trying again.
 
+=has pkgname
+
+The name of the package created.
+
 =head1 AUTHOR
 
 Jerome Quelin <jquelin@gmail.com>
@@ -188,7 +204,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-

@@ -12,7 +12,7 @@ use warnings;
 
 package App::CPAN2Pkg::Lock;
 {
-  $App::CPAN2Pkg::Lock::VERSION = '2.120460';
+  $App::CPAN2Pkg::Lock::VERSION = '2.122620';
 }
 # ABSTRACT:
 
@@ -60,16 +60,17 @@ sub release {
 
 1;
 
+__END__
 
 =pod
 
 =head1 NAME
 
-App::CPAN2Pkg::Lock
+App::CPAN2Pkg::Lock - use Moose;
 
 =head1 VERSION
 
-version 2.120460
+version 2.122620
 
 =head1 SYNOPSIS
 
@@ -126,7 +127,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-

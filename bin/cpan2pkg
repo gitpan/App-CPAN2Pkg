@@ -14,7 +14,7 @@ use warnings;
 
 package cpan2pkg;
 {
-  $cpan2pkg::VERSION = '2.120460';
+  $cpan2pkg::VERSION = '2.122620';
 }
 # ABSTRACT: generating native linux packages from cpan
 
@@ -25,7 +25,7 @@ use App::CPAN2Pkg;
 App::CPAN2Pkg->run( @ARGV );
 exit;
 
-
+__END__
 
 =pod
 
@@ -35,7 +35,7 @@ cpan2pkg - generating native linux packages from cpan
 
 =head1 VERSION
 
-version 2.120460
+version 2.122620
 
 =head1 SYNOPSIS
 
@@ -89,7 +89,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-

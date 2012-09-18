@@ -12,7 +12,7 @@ use warnings;
 
 package App::CPAN2Pkg::Controller;
 {
-  $App::CPAN2Pkg::Controller::VERSION = '2.120460';
+  $App::CPAN2Pkg::Controller::VERSION = '2.122620';
 }
 # ABSTRACT: controller for cpan2pkg interface
 
@@ -94,6 +94,7 @@ no Moose;
 __PACKAGE__->meta->make_immutable;
 1;
 
+__END__
 
 =pod
 
@@ -103,7 +104,7 @@ App::CPAN2Pkg::Controller - controller for cpan2pkg interface
 
 =head1 VERSION
 
-version 2.120460
+version 2.122620
 
 =head1 DESCRIPTION
 
@@ -154,7 +155,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-

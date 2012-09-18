@@ -12,7 +12,7 @@ use warnings;
 
 package App::CPAN2Pkg::Worker::Mageia;
 {
-  $App::CPAN2Pkg::Worker::Mageia::VERSION = '2.120460';
+  $App::CPAN2Pkg::Worker::Mageia::VERSION = '2.122620';
 }
 # ABSTRACT: worker dedicated to Mageia distribution
 
@@ -85,7 +85,7 @@ override cpan2dist_flavour => sub { "CPANPLUS::Dist::Mageia" };
         my $self = shift;
         my $srpm = $self->srpm;
         my $cmd = "mgarepo import $srpm";
-        $self->run_command( $cmd => "_upstram_import_package_result" );
+        $self->run_command( $cmd => "_upstream_import_package_result" );
     };
 }
 
@@ -93,10 +93,9 @@ override cpan2dist_flavour => sub { "CPANPLUS::Dist::Mageia" };
     override upstream_build_package => sub {
         super();
         my $self = shift;
-        my $pkgname = $self->srpm->basename;
-        $pkgname =~ s/-\d.*$//;
+        my $pkgname = $self->pkgname;
         my $cmd = "mgarepo submit $pkgname";
-        $self->run_command( $cmd => "_upstram_build_package_result" );
+        $self->run_command( $cmd => "_upstream_build_package_result" );
     };
 
     override _upstream_build_wait => sub {
@@ -106,31 +105,16 @@ override cpan2dist_flavour => sub { "CPANPLUS::Dist::Mageia" };
 
     event _upstream_build_wait_request => sub {
         my $self = shift;
-        my $url = "http://pkgsubmit.mageia.org/";
-        my $request = HTTP::Request->new(GET => $url);
+        my $pkgname = $self->pkgname;
+        my $url = "http://pkgsubmit.mageia.org/?package=$pkgname&last";
+        my $request = HTTP::Request->new(HEAD => $url);
         $K->post( $self->_ua => request => _upstream_build_wait_answer => $request );
     };
 
     event _upstream_build_wait_answer => sub {
         my ($self, $requests, $answers) = @_[OBJECT, ARG0, ARG1];
         my $answer = $answers->[0];
-        my $pkg = $self->srpm->basename;
-        $pkg =~ s/\.src.rpm$//;
-
-        my $tree  = HTML::TreeBuilder->new_from_content( $answer->as_string );
-        my (undef, $table) = $tree->find_by_tag_name('table');
-        my $link  = $table->look_down(
-            _tag => "a",
-            sub {
-                my ($text) = $_[0]->content_list;
-                $text =~ /$pkg/;
-            }
-        );
-        my (@cells)  = $link->parent->parent->content_list;
-        my ($status) = $cells[6]->content_list;
-        ($status) = $status->content_list if ref($status);
-        $status = "unknown" if ref($status);
-
+        my $status = $answer->header( 'x-bs-package-status' );
         my $modname = $self->module->name;
         given ( $status ) {
             when ( "uploaded" ) {
@@ -142,8 +126,7 @@ override cpan2dist_flavour => sub { "CPANPLUS::Dist::Mageia" };
                 $K->delay( _upstream_build_package_ready => $min * 60 );
             }
             when ( "failure" ) {
-                my ($cell) = $cells[6]->content_list;
-                my $url = "http://pkgsubmit.mageia.org/" . $cell->attr("href");
+                my $url = "http://pkgsubmit.mageia.org/";
                 $self->yield( _upstream_build_package_failed => $url );
             }
             default {
@@ -161,6 +144,7 @@ no Moose;
 __PACKAGE__->meta->make_immutable;
 1;
 
+__END__
 
 =pod
 
@@ -170,7 +154,7 @@ App::CPAN2Pkg::Worker::Mageia - worker dedicated to Mageia distribution
 
 =head1 VERSION
 
-version 2.120460
+version 2.122620
 
 =head1 DESCRIPTION
 
@@ -189,7 +173,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-

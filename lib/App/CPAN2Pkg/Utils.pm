@@ -12,7 +12,7 @@ use warnings;
 
 package App::CPAN2Pkg::Utils;
 {
-  $App::CPAN2Pkg::Utils::VERSION = '2.120460';
+  $App::CPAN2Pkg::Utils::VERSION = '2.122620';
 }
 # ABSTRACT: various utilities for cpan2pkg
 
@@ -32,6 +32,7 @@ our $WORKER_TYPE   = "App::CPAN2Pkg::Worker::$LINUX_FLAVOUR";
 
 1;
 
+__END__
 
 =pod
 
@@ -41,7 +42,7 @@ App::CPAN2Pkg::Utils - various utilities for cpan2pkg
 
 =head1 VERSION
 
-version 2.120460
+version 2.122620
 
 =head1 DESCRIPTION
 
@@ -60,7 +61,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-

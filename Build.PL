@@ -21,7 +21,7 @@ my %module_build_args = (
     "Jerome Quelin <jquelin\@gmail.com>"
   ],
   "dist_name" => "App-CPAN2Pkg",
-  "dist_version" => "2.120460",
+  "dist_version" => "2.122620",
   "license" => "perl",
   "module_name" => "App::CPAN2Pkg",
   "recommends" => {},

@@ -12,7 +12,7 @@ use warnings;
 
 package App::CPAN2Pkg::Tk::Main;
 {
-  $App::CPAN2Pkg::Tk::Main::VERSION = '2.120460';
+  $App::CPAN2Pkg::Tk::Main::VERSION = '2.122620';
 }
 # ABSTRACT: main cpan2pkg window
 
@@ -377,6 +377,7 @@ no Moose;
 __PACKAGE__->meta->make_immutable;
 1;
 
+__END__
 
 =pod
 
@@ -386,7 +387,7 @@ App::CPAN2Pkg::Tk::Main - main cpan2pkg window
 
 =head1 VERSION
 
-version 2.120460
+version 2.122620
 
 =head1 DESCRIPTION
 
@@ -439,7 +440,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-

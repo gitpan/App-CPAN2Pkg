@@ -12,7 +12,7 @@ use warnings;
 
 package App::CPAN2Pkg::Worker;
 {
-  $App::CPAN2Pkg::Worker::VERSION = '2.120460';
+  $App::CPAN2Pkg::Worker::VERSION = '2.122620';
 }
 # ABSTRACT: poe session to drive a module packaging
 
@@ -471,11 +471,11 @@ sub START {
     };
 
     #
-    # _upstram_import_package_result( $status )
+    # _upstream_import_package_result( $status )
     #
     # received when import of the package has been done.
     #
-    event _upstram_import_package_result => sub {
+    event _upstream_import_package_result => sub {
         my ($self, $status) = @_[OBJECT, ARG0];
         my $module  = $self->module;
         my $modname = $module->name;
@@ -553,11 +553,11 @@ sub START {
     };
 
     #
-    # _upstram_build_package_result( $status )
+    # _upstream_build_package_result( $status )
     #
     # received when package submitting has been done.
     #
-    event _upstram_build_package_result => sub {
+    event _upstream_build_package_result => sub {
         my ($self, $status) = @_[OBJECT, ARG0];
         my $module  = $self->module;
         my $modname = $module->name;
@@ -668,6 +668,7 @@ no Moose;
 __PACKAGE__->meta->make_immutable;
 1;
 
+__END__
 
 =pod
 
@@ -677,7 +678,7 @@ App::CPAN2Pkg::Worker - poe session to drive a module packaging
 
 =head1 VERSION
 
-version 2.120460
+version 2.122620
 
 =head1 DESCRIPTION
 
@@ -826,7 +827,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-
