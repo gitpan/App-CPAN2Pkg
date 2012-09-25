@@ -12,7 +12,7 @@ use warnings;
 
 package App::CPAN2Pkg::Controller;
 {
-  $App::CPAN2Pkg::Controller::VERSION = '2.122620';
+  $App::CPAN2Pkg::Controller::VERSION = '2.122690';
 }
 # ABSTRACT: controller for cpan2pkg interface
 
@@ -104,7 +104,7 @@ App::CPAN2Pkg::Controller - controller for cpan2pkg interface
 
 =head1 VERSION
 
-version 2.122620
+version 2.122690
 
 =head1 DESCRIPTION
 

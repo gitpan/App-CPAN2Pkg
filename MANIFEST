@@ -12,9 +12,9 @@ lib/App/CPAN2Pkg/Controller.pm
 lib/App/CPAN2Pkg/Lock.pm
 lib/App/CPAN2Pkg/Module.pm
 lib/App/CPAN2Pkg/Repository.pm
-lib/App/CPAN2Pkg/Tk/Main.pm
-lib/App/CPAN2Pkg/Tk/Utils.pm
 lib/App/CPAN2Pkg/Types.pm
+lib/App/CPAN2Pkg/UI/Text.pm
+lib/App/CPAN2Pkg/UI/Tk.pm
 lib/App/CPAN2Pkg/Utils.pm
 lib/App/CPAN2Pkg/Worker.pm
 lib/App/CPAN2Pkg/Worker/Mageia.pm

@@ -12,27 +12,19 @@ use warnings;
 
 package App::CPAN2Pkg;
 {
-  $App::CPAN2Pkg::VERSION = '2.122620';
+  $App::CPAN2Pkg::VERSION = '2.122690';
 }
 # ABSTRACT: generating native linux packages from cpan
 
-# although it's not strictly needed to load POE::Kernel manually (since
-# MooseX::POE will load it anyway), we're doing it here to make sure poe
-# will use tk event loop. this can also be done by loading module tk
-# before poe, for example if we load app::cpan2pkg::tk::main before
-# moosex::poe... but better be safe than sorry, and doing things
-# explicitly is always better.
-use POE::Kernel { loop => 'Tk' };
-
 use MooseX::Singleton;
 use MooseX::Has::Sugar;
+use POE;
 use Readonly;
 
 use App::CPAN2Pkg::Controller;
-use App::CPAN2Pkg::Tk::Main;
+use App::CPAN2Pkg::UI::Text;
+use App::CPAN2Pkg::UI::Tk;
 use App::CPAN2Pkg::Utils      qw{ $LINUX_FLAVOUR $WORKER_TYPE };
-
-use POE;
 
 # -- private attributes
 
@@ -45,7 +37,9 @@ has _modules => (
         all_modules     => 'keys',
         seen_module     => 'exists',
         register_module => 'set',
+        forget_module   => 'delete',
         module          => 'get',
+        nb_modules      => 'count',
     }
 );
 
@@ -58,7 +52,7 @@ has _modules => (
 
 
 sub run {
-    my (undef, @modules) = @_;
+    my (undef, $opt, @modules) = @_;
 
     # check if the platform is supported
     eval "require $WORKER_TYPE";
@@ -67,7 +61,9 @@ sub run {
 
     # create the poe sessions
     App::CPAN2Pkg::Controller->new( queue=>\@modules );
-    App::CPAN2Pkg::Tk::Main->new;
+    my $ui = $opt->{ui} eq "gui"
+        ? "App::CPAN2Pkg::UI::Tk" : "App::CPAN2Pkg::UI::Text";
+    $ui->new;
 
     # and let's start the fun!
     POE::Kernel->run;
@@ -88,7 +84,7 @@ App::CPAN2Pkg - generating native linux packages from cpan
 
 =head1 VERSION
 
-version 2.122620
+version 2.122690
 
 =head1 SYNOPSIS
 
@@ -110,6 +106,12 @@ also provides some information about processed modules.
 
 Return the list of all modules that have been / are being processed.
 
+=head2 nb_modules
+
+    my $nbmods = $app->nb_modules;
+
+Return the number of modules being processed.
+
 =head2 seen_module
 
     my $bool = $app->seen_module( $modname );
@@ -123,6 +125,12 @@ finished processing, or still ongoing.
 
 Store C<$module> as the L<App::CPAN2Pkg::Module> object tracking
 C<$modname>.
+
+=head2 forget_module
+
+    $app->forget_module( $modname );
+
+Forget C<$modname> and its associated L<App::CPAN2Pkg::Module> object.
 
 =head2
 

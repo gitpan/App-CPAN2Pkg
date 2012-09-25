@@ -10,9 +10,9 @@ use 5.012;
 use strict;
 use warnings;
 
-package App::CPAN2Pkg::Tk::Main;
+package App::CPAN2Pkg::UI::Tk;
 {
-  $App::CPAN2Pkg::Tk::Main::VERSION = '2.122620';
+  $App::CPAN2Pkg::UI::Tk::VERSION = '2.122690';
 }
 # ABSTRACT: main cpan2pkg window
 
@@ -33,7 +33,6 @@ use Tk::Sugar;
 
 with 'Tk::Role::HasWidgets';
 
-use App::CPAN2Pkg::Tk::Utils qw{ image };
 use App::CPAN2Pkg::Utils     qw{ $SHAREDIR };
 
 Readonly my $K  => $poe_kernel;
@@ -127,8 +126,8 @@ event module_state => sub {
     my $coloru = $color{ $module->upstream->status };
 
     # update bullets
-    my $bulletl = image( $SHAREDIR->file("bullets", "$colorl.png") );
-    my $bulletu = image( $SHAREDIR->file("bullets", "$coloru.png") );
+    my $bulletl = _image( $SHAREDIR->file("bullets", "$colorl.png") );
+    my $bulletu = _image( $SHAREDIR->file("bullets", "$coloru.png") );
     $hlist->itemConfigure( $elem, 0, -image=>$bulletl );
     $hlist->itemConfigure( $elem, 1, -image=>$bulletu );
 
@@ -153,7 +152,7 @@ event new_module => sub {
     my @pos = defined $next ? ( -before => $next ) : ( -at => -1 );
 
     # create module in the list
-    my $bullet = image( $SHAREDIR->file("bullets", "black.png") );
+    my $bullet = _image( $SHAREDIR->file("bullets", "black.png") );
     my $elem = $hlist->addchild( "", -data=>$modname, @pos );
     $hlist->itemCreate( $elem, 0, -itemtype => 'image', -image=>$bullet );
     $hlist->itemCreate( $elem, 1, -itemtype => 'image', -image=>$bullet );
@@ -260,7 +259,7 @@ sub _build_gui {
 
     # set windowtitle
     $mw->title('cpan2pkg');
-    $mw->iconimage( image( $SHAREDIR->file('icon.png') ) );
+    $mw->iconimage( _image( $SHAREDIR->file('icon.png') ) );
     $mw->iconmask ( '@' . $SHAREDIR->file('icon-mask.xbm') );
 
     # make sure window is big enough
@@ -363,15 +362,33 @@ sub _build_notebook {
       ->grid( -row => 0, -column => 2,  -columnspan=>2,-sticky => 'w' );
     my $buldir = $SHAREDIR->subdir( 'bullets' );
     foreach my $i ( 0 .. $#lab1 ) {
-        $legend->Label( -image => image( $buldir->file( $col1[$i] . ".png" ) ) )
+        $legend->Label( -image => _image( $buldir->file( $col1[$i] . ".png" ) ) )
           ->grid( -row => $i + 1, -column => 0, ipad5 );
-        $legend->Label( -image => image( $buldir->file( $col2[$i] . ".png" ) ) )
+        $legend->Label( -image => _image( $buldir->file( $col2[$i] . ".png" ) ) )
           ->grid( -row => $i + 1, -column => 2, ipad5 );
         $legend->Label( -text => $lab1[$i] )->grid( -row=>$i+1, -column=>1, -sticky => 'w' );
         $legend->Label( -text => $lab2[$i] )->grid( -row=>$i+1, -column=>3, -sticky => 'w' );
     }
 
 }
+
+
+# -- private subs
+
+#
+#    my $img = _image( $path );
+#
+# Return a tk image loaded from C<$path>. If the photo has already been
+# loaded, return a handle on it.
+#
+sub _image {
+    my $path = shift;
+    my $img = $poe_main_window->Photo($path);
+    return $img if $img->width;
+    return $poe_main_window->Photo($path, -file=>$path);
+}
+
+
 
 no Moose;
 __PACKAGE__->meta->make_immutable;
@@ -383,11 +400,11 @@ __END__
 
 =head1 NAME
 
-App::CPAN2Pkg::Tk::Main - main cpan2pkg window
+App::CPAN2Pkg::UI::Tk - main cpan2pkg window
 
 =head1 VERSION
 
-version 2.122620
+version 2.122690
 
 =head1 DESCRIPTION
 
