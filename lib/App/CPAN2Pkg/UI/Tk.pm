@@ -12,7 +12,7 @@ use warnings;
 
 package App::CPAN2Pkg::UI::Tk;
 {
-  $App::CPAN2Pkg::UI::Tk::VERSION = '3.000';
+  $App::CPAN2Pkg::UI::Tk::VERSION = '3.001';
 }
 # ABSTRACT: main cpan2pkg window
 
@@ -136,6 +136,18 @@ event module_state => sub {
 #        && $module->upstream->status eq 'available';
 
     $hlist->update;
+
+    # allow user to mark a module as available
+    return unless $module->local->status eq "error"
+        or $module->upstream->status eq "error";
+    my $nb = $self->_w('notebook');
+    my $pane   = $nb->page_widget( $modname );
+    my $button = $pane->Button(
+        -text    => 'Mark module as available (locally & upstream)',
+        -command => $self->_session->postback( "_on_btn_mark_available", $module ),
+    )->pack( top, fillx );
+    $self->_set_w( "mark_available_$modname" => $button );
+    $nb->update;
 };
 
 # -- public events
@@ -218,6 +230,32 @@ event _on_btn_clean_all => sub {
 };
 
 #
+# event: _on_btn_mark_available( $module )
+#
+# received when user clicked the button to mark a module as available.
+#
+event _on_btn_mark_available => sub {
+    my ($self, $args) = @_[ OBJECT, ARG0 ];
+    my $module = $args->[0];
+    my $modname = $module->name;
+
+    # change module status and update interface
+    $module->local->set_status( "available" );
+    $module->upstream->set_status( "available" );
+    $K->yield( log_result => $modname => "Module marked available manually" );
+    $K->yield( module_state => $module );
+
+    # signal controller that module is available
+    $K->post( controller => module_ready_locally  => $modname );
+    $K->post( controller => module_ready_upstream => $modname );
+
+    # remove the button
+    $self->_w( "mark_available_$modname" )->destroy;
+    $self->_del_w( "mark_available_$modname" );
+    $self->_w('notebook')->update;
+};
+
+#
 # event: _on_btn_submit()
 #
 # received when user clicked the submit button.
@@ -226,6 +264,7 @@ event _on_btn_submit => sub {
     my $self = shift;
     my $entry = $self->_w( "ent_module" );
     my $module = $entry->get;
+    return unless $module;
     $K->post( controller => new_module_wanted => $module );
     $entry->delete( 0, 'end' );
 };
@@ -286,9 +325,11 @@ sub _build_gui {
 
     #
     my $f = $mw->Frame->pack( top, xfill2 );
-    $self->_build_hlist( $f );
-    $self->_build_close_btn( $f );
-    $self->_build_notebook( $f );
+    my $f1 = $f->Frame->pack( left, filly );
+    my $f2 = $f->Frame->pack( left, xfill2 );
+    $self->_build_hlist( $f1 );
+    $self->_build_close_btn( $f1 );
+    $self->_build_notebook( $f2 );
 
     # center & show the window
     # FIXME: restore last position saved?
@@ -325,7 +366,7 @@ sub _build_hlist {
         -width      => 30,
         -columns    => 3,
         -header     => 1,
-    )->pack( left, filly );
+    )->pack( top, xfilly );
     $self->_set_w( hlist => $hlist );
 
     $hlist->header( create => 0, -text => 'local' );
@@ -404,7 +445,7 @@ App::CPAN2Pkg::UI::Tk - main cpan2pkg window
 
 =head1 VERSION
 
-version 3.000
+version 3.001
 
 =head1 DESCRIPTION
 

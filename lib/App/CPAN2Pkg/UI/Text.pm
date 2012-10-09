@@ -12,7 +12,7 @@ use warnings;
 
 package App::CPAN2Pkg::UI::Text;
 {
-  $App::CPAN2Pkg::UI::Text::VERSION = '3.000';
+  $App::CPAN2Pkg::UI::Text::VERSION = '3.001';
 }
 # ABSTRACT: text interface for cpan2pkg
 
@@ -140,7 +140,7 @@ App::CPAN2Pkg::UI::Text - text interface for cpan2pkg
 
 =head1 VERSION
 
-version 3.000
+version 3.001
 
 =head1 DESCRIPTION
 

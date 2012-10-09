@@ -12,7 +12,7 @@ use warnings;
 
 package App::CPAN2Pkg::Worker::RPM;
 {
-  $App::CPAN2Pkg::Worker::RPM::VERSION = '3.000';
+  $App::CPAN2Pkg::Worker::RPM::VERSION = '3.001';
 }
 # ABSTRACT: worker specialized in rpm distributions
 
@@ -155,7 +155,7 @@ App::CPAN2Pkg::Worker::RPM - worker specialized in rpm distributions
 
 =head1 VERSION
 
-version 3.000
+version 3.001
 
 =head1 DESCRIPTION
 

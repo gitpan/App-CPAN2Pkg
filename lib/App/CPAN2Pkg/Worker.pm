@@ -12,7 +12,7 @@ use warnings;
 
 package App::CPAN2Pkg::Worker;
 {
-  $App::CPAN2Pkg::Worker::VERSION = '3.000';
+  $App::CPAN2Pkg::Worker::VERSION = '3.001';
 }
 # ABSTRACT: poe session to drive a module packaging
 
@@ -679,7 +679,7 @@ App::CPAN2Pkg::Worker - poe session to drive a module packaging
 
 =head1 VERSION
 
-version 3.000
+version 3.001
 
 =head1 DESCRIPTION
 

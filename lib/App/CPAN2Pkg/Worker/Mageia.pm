@@ -12,7 +12,7 @@ use warnings;
 
 package App::CPAN2Pkg::Worker::Mageia;
 {
-  $App::CPAN2Pkg::Worker::Mageia::VERSION = '3.000';
+  $App::CPAN2Pkg::Worker::Mageia::VERSION = '3.001';
 }
 # ABSTRACT: worker dedicated to Mageia distribution
 
@@ -154,7 +154,7 @@ App::CPAN2Pkg::Worker::Mageia - worker dedicated to Mageia distribution
 
 =head1 VERSION
 
-version 3.000
+version 3.001
 
 =head1 DESCRIPTION
 
