@@ -12,7 +12,7 @@ use warnings;
 
 package App::CPAN2Pkg::Worker::RPM;
 {
-  $App::CPAN2Pkg::Worker::RPM::VERSION = '2.122690';
+  $App::CPAN2Pkg::Worker::RPM::VERSION = '3.000';
 }
 # ABSTRACT: worker specialized in rpm distributions
 
@@ -155,7 +155,7 @@ App::CPAN2Pkg::Worker::RPM - worker specialized in rpm distributions
 
 =head1 VERSION
 
-version 2.122690
+version 3.000
 
 =head1 DESCRIPTION
 
@@ -179,6 +179,10 @@ Path to the source RPM of the module built with C<cpan2dist>.
 
 Path to the RPM of the module built with C<cpan2dist>.
 
+=head2 pkgname
+
+The name of the package created.
+
 =head1 EVENTS
 
 =head2 get_rpm_lock
@@ -187,10 +191,6 @@ Path to the RPM of the module built with C<cpan2dist>.
 
 Try to get a hold on RPM lock. Fire C<$event> if lock was grabbed
 successfully, otherwise wait 5 seconds before trying again.
-
-=has pkgname
-
-The name of the package created.
 
 =head1 AUTHOR
 

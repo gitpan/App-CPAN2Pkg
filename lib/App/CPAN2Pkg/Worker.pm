@@ -12,7 +12,7 @@ use warnings;
 
 package App::CPAN2Pkg::Worker;
 {
-  $App::CPAN2Pkg::Worker::VERSION = '2.122690';
+  $App::CPAN2Pkg::Worker::VERSION = '3.000';
 }
 # ABSTRACT: poe session to drive a module packaging
 
@@ -294,6 +294,7 @@ sub START {
 
         $K->post( main => log_step => $modname => "Finding module prereqs" );
         my $cmd = "cpanp /prereqs show $modname";
+        $ENV{PERL_AUTOINSTALL} = "--skipdeps";
         $self->run_command( $cmd => "_cpanplus_find_prereqs_result" );
     };
 
@@ -678,7 +679,7 @@ App::CPAN2Pkg::Worker - poe session to drive a module packaging
 
 =head1 VERSION
 
-version 2.122690
+version 3.000
 
 =head1 DESCRIPTION
 

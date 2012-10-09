@@ -12,7 +12,7 @@ use warnings;
 
 package App::CPAN2Pkg::Worker::Mageia;
 {
-  $App::CPAN2Pkg::Worker::Mageia::VERSION = '2.122690';
+  $App::CPAN2Pkg::Worker::Mageia::VERSION = '3.000';
 }
 # ABSTRACT: worker dedicated to Mageia distribution
 
@@ -114,12 +114,12 @@ override cpan2dist_flavour => sub { "CPANPLUS::Dist::Mageia" };
     event _upstream_build_wait_answer => sub {
         my ($self, $requests, $answers) = @_[OBJECT, ARG0, ARG1];
         my $answer = $answers->[0];
-        my $status = $answer->header( 'x-bs-package-status' );
+        my $status = $answer->header( 'x-bs-package-status' ) // "?";
         my $modname = $self->module->name;
         given ( $status ) {
             when ( "uploaded" ) {
                 # nice, we finally made it!
-                my $min = 3;
+                my $min = 1;
                 $K->post( main => log_comment => $modname =>
                     "module successfully built, waiting $min minutes to index it" );
                 # wait some time to be sure package has been indexed
@@ -154,7 +154,7 @@ App::CPAN2Pkg::Worker::Mageia - worker dedicated to Mageia distribution
 
 =head1 VERSION
 
-version 2.122690
+version 3.000
 
 =head1 DESCRIPTION
 

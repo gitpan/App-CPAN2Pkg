@@ -12,7 +12,7 @@ use warnings;
 
 package App::CPAN2Pkg::UI::Text;
 {
-  $App::CPAN2Pkg::UI::Text::VERSION = '2.122690';
+  $App::CPAN2Pkg::UI::Text::VERSION = '3.000';
 }
 # ABSTRACT: text interface for cpan2pkg
 
@@ -108,8 +108,9 @@ event module_state => sub {
 
     {
         local $Term::ANSIColor::AUTORESET = 1;
-        my $nb = $app->nb_modules;
-        print "$timestamp - $nb modules remaining\n";
+        my $nb   = $app->nb_modules;
+        my @mods = $app->all_modules;
+        print YELLOW "$timestamp cpan2pkg - $nb modules remaining: @mods\n";
         exit if $nb == 0;
     }
 
@@ -139,7 +140,7 @@ App::CPAN2Pkg::UI::Text - text interface for cpan2pkg
 
 =head1 VERSION
 
-version 2.122690
+version 3.000
 
 =head1 DESCRIPTION
 
