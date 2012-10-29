@@ -14,7 +14,7 @@ use warnings;
 
 package cpan2pkg;
 {
-  $cpan2pkg::VERSION = '3.001';
+  $cpan2pkg::VERSION = '3.002';
 }
 # ABSTRACT: generating native linux packages from cpan
 
@@ -51,7 +51,7 @@ cpan2pkg - generating native linux packages from cpan
 
 =head1 VERSION
 
-version 3.001
+version 3.002
 
 =head1 SYNOPSIS
 

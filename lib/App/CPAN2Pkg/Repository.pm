@@ -12,7 +12,7 @@ use warnings;
 
 package App::CPAN2Pkg::Repository;
 {
-  $App::CPAN2Pkg::Repository::VERSION = '3.001';
+  $App::CPAN2Pkg::Repository::VERSION = '3.002';
 }
 # ABSTRACT: repository details for a given module
 
@@ -68,7 +68,7 @@ App::CPAN2Pkg::Repository - repository details for a given module
 
 =head1 VERSION
 
-version 3.001
+version 3.002
 
 =head1 DESCRIPTION
 
