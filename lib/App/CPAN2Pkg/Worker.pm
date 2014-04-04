@@ -11,11 +11,8 @@ use strict;
 use warnings;
 
 package App::CPAN2Pkg::Worker;
-{
-  $App::CPAN2Pkg::Worker::VERSION = '3.002';
-}
 # ABSTRACT: poe session to drive a module packaging
-
+$App::CPAN2Pkg::Worker::VERSION = '3.003';
 use List::MoreUtils qw{ firstidx };
 use Moose;
 use MooseX::ClassAttribute;
@@ -241,7 +238,10 @@ sub START {
 
         # cpanplus not yet initialized
         $lock->get( $modname );
-        my $cmd = "cpanp x --update_source";
+        my $cmd = $ENV{CPAN2PKG_NO_CPANP_X}
+            ? "echo 'CPAN2PKG_NO_CPANP_X: skipping cpanp index recreation'"
+            : "cpanp x --update_source";
+
         $self->run_command( $cmd => "_cpanplus_initialize_result" );
     };
 
@@ -679,7 +679,7 @@ App::CPAN2Pkg::Worker - poe session to drive a module packaging
 
 =head1 VERSION
 
-version 3.002
+version 3.003
 
 =head1 DESCRIPTION
 

@@ -11,11 +11,8 @@ use strict;
 use warnings;
 
 package App::CPAN2Pkg::UI::Text;
-{
-  $App::CPAN2Pkg::UI::Text::VERSION = '3.002';
-}
 # ABSTRACT: text interface for cpan2pkg
-
+$App::CPAN2Pkg::UI::Text::VERSION = '3.003';
 use DateTime;
 use List::Util qw{ first };
 use Moose;
@@ -140,7 +137,7 @@ App::CPAN2Pkg::UI::Text - text interface for cpan2pkg
 
 =head1 VERSION
 
-version 3.002
+version 3.003
 
 =head1 DESCRIPTION
 

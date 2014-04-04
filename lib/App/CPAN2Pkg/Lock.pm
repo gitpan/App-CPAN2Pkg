@@ -11,11 +11,8 @@ use strict;
 use warnings;
 
 package App::CPAN2Pkg::Lock;
-{
-  $App::CPAN2Pkg::Lock::VERSION = '3.002';
-}
 # ABSTRACT:
-
+$App::CPAN2Pkg::Lock::VERSION = '3.003';
 use Moose;
 use MooseX::Has::Sugar;
 
@@ -66,11 +63,11 @@ __END__
 
 =head1 NAME
 
-App::CPAN2Pkg::Lock - use Moose;
+App::CPAN2Pkg::Lock - $App::CPAN2Pkg::Lock::VERSION = '3.003';
 
 =head1 VERSION
 
-version 3.002
+version 3.003
 
 =head1 SYNOPSIS
 
