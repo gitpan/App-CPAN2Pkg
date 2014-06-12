@@ -12,7 +12,7 @@ use warnings;
 
 package App::CPAN2Pkg::UI::Tk;
 # ABSTRACT: main cpan2pkg window
-$App::CPAN2Pkg::UI::Tk::VERSION = '3.003';
+$App::CPAN2Pkg::UI::Tk::VERSION = '3.004';
 use DateTime;
 use List::Util qw{ first };
 use Moose;
@@ -442,7 +442,7 @@ App::CPAN2Pkg::UI::Tk - main cpan2pkg window
 
 =head1 VERSION
 
-version 3.003
+version 3.004
 
 =head1 DESCRIPTION
 

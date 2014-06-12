@@ -12,7 +12,7 @@ use warnings;
 
 package App::CPAN2Pkg::Worker::RPM;
 # ABSTRACT: worker specialized in rpm distributions
-$App::CPAN2Pkg::Worker::RPM::VERSION = '3.003';
+$App::CPAN2Pkg::Worker::RPM::VERSION = '3.004';
 use Moose;
 use MooseX::ClassAttribute;
 use MooseX::Has::Sugar;
@@ -152,7 +152,7 @@ App::CPAN2Pkg::Worker::RPM - worker specialized in rpm distributions
 
 =head1 VERSION
 
-version 3.003
+version 3.004
 
 =head1 DESCRIPTION
 

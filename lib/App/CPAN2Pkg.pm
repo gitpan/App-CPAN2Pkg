@@ -12,7 +12,7 @@ use warnings;
 
 package App::CPAN2Pkg;
 # ABSTRACT: generating native linux packages from cpan
-$App::CPAN2Pkg::VERSION = '3.003';
+$App::CPAN2Pkg::VERSION = '3.004';
 use MooseX::Singleton;
 use MooseX::Has::Sugar;
 use POE;
@@ -81,7 +81,7 @@ App::CPAN2Pkg - generating native linux packages from cpan
 
 =head1 VERSION
 
-version 3.003
+version 3.004
 
 =head1 SYNOPSIS
 

@@ -14,7 +14,7 @@ use warnings;
 
 package cpan2pkg;
 # ABSTRACT: generating native linux packages from cpan
-$cpan2pkg::VERSION = '3.003';
+$cpan2pkg::VERSION = '3.004';
 # for testing purposes
 use Find::Lib '../lib';
 use Getopt::Long::Descriptive;
@@ -48,7 +48,7 @@ cpan2pkg - generating native linux packages from cpan
 
 =head1 VERSION
 
-version 3.003
+version 3.004
 
 =head1 SYNOPSIS
 
@@ -88,8 +88,8 @@ then submit module to upstream buildsystem.
 And this, while dealing with dependencies, all the way long, repeating
 steps over and over as needed.
 
-Read L<this blog entry|http://jquelin.blogspot.com/2009/01/cpan-modules-native-linux-
-packages.html> for this module rationale.
+Read L<this blog entry|http://jquelin.blogspot.com/2009/01/cpan-modules-native-linux-packages.html>
+for this module rationale.
 
 =head1 AUTHOR
 

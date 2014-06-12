@@ -12,7 +12,7 @@ use strict;
 
 package App::CPAN2Pkg::Types;
 # ABSTRACT: types used in the distribution
-$App::CPAN2Pkg::Types::VERSION = '3.003';
+$App::CPAN2Pkg::Types::VERSION = '3.004';
 use Moose::Util::TypeConstraints;
 
 enum Status => [ "not started", "not available", qw{ importing building installing available error } ];
@@ -29,7 +29,7 @@ App::CPAN2Pkg::Types - types used in the distribution
 
 =head1 VERSION
 
-version 3.003
+version 3.004
 
 =head1 DESCRIPTION
 

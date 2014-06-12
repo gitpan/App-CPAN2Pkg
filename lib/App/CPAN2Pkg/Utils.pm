@@ -12,7 +12,7 @@ use warnings;
 
 package App::CPAN2Pkg::Utils;
 # ABSTRACT: various utilities for cpan2pkg
-$App::CPAN2Pkg::Utils::VERSION = '3.003';
+$App::CPAN2Pkg::Utils::VERSION = '3.004';
 use Devel::Platform::Info::Linux;
 use Exporter::Lite;
 use File::ShareDir::PathClass qw{ dist_dir };
@@ -39,7 +39,7 @@ App::CPAN2Pkg::Utils - various utilities for cpan2pkg
 
 =head1 VERSION
 
-version 3.003
+version 3.004
 
 =head1 DESCRIPTION
 

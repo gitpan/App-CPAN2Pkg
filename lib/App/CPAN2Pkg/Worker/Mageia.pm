@@ -12,7 +12,7 @@ use warnings;
 
 package App::CPAN2Pkg::Worker::Mageia;
 # ABSTRACT: worker dedicated to Mageia distribution
-$App::CPAN2Pkg::Worker::Mageia::VERSION = '3.003';
+$App::CPAN2Pkg::Worker::Mageia::VERSION = '3.004';
 use HTML::TreeBuilder;
 use HTTP::Request;
 use Moose;
@@ -188,7 +188,7 @@ App::CPAN2Pkg::Worker::Mageia - worker dedicated to Mageia distribution
 
 =head1 VERSION
 
-version 3.003
+version 3.004
 
 =head1 DESCRIPTION
 

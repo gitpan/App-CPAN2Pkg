@@ -12,7 +12,7 @@ use warnings;
 
 package App::CPAN2Pkg::Module;
 # ABSTRACT: poe session to drive a module packaging
-$App::CPAN2Pkg::Module::VERSION = '3.003';
+$App::CPAN2Pkg::Module::VERSION = '3.004';
 use Moose;
 use MooseX::Has::Sugar;
 use MooseX::SemiAffordanceAccessor;
@@ -61,7 +61,7 @@ App::CPAN2Pkg::Module - poe session to drive a module packaging
 
 =head1 VERSION
 
-version 3.003
+version 3.004
 
 =head1 DESCRIPTION
 
